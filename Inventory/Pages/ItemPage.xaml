@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add the xmlns:fresh line and use it to resolve the fresh:FreshBaseContentPage declaration -->
+<fresh:FreshBaseContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Inventory.ItemPage" xmlns:fresh="clr-namespace:FreshMvvm;assembly=Inventory">
+    <ContentPage.Content>
+        <StackLayout Padding="15" Spacing="5">
+            <Label Text="Item Name" />
+            <Entry Text="{Binding ItemName}" />
+            <Label Text="Item Barcode" />
+            <Entry Text="{Binding ItemBarcode}" />
+            <Label Text="Item Quantity" />
+            <Entry Text="{Binding ItemQuantity}" />
+            <Button Text="Save" Command="{Binding SaveCommand}" />
+        </StackLayout>
+    </ContentPage.Content>
+</fresh:FreshBaseContentPage>
