@@ -48,6 +48,10 @@ namespace Inventory
             {
                 CreateSampleData();
             }
+
+            MessagingCenter.Subscribe<App, string>(this, "ScanBarcode", (sender, arg) => {
+                ScanBarcode(arg);
+            });
         }
 
         /// <summary>
@@ -140,6 +144,25 @@ namespace Inventory
             allTasks.Wait();
 
             LoadItems();
+        }
+
+        private void ScanBarcode(string barcode)
+        {
+            Item item;
+
+            Task<List<Item>> getItemTask = _repository.GetItem(barcode);
+            getItemTask.Wait();
+            if (getItemTask.Result.Count() < 1)
+            {
+                item = new Item { Name = "", Barcode = barcode };
+            }
+            else
+            {
+                item = getItemTask.Result.First<Item>();
+            }
+
+
+            CoreMethods.PushPageModel<ItemPageModel>(item);
         }
     }
 }

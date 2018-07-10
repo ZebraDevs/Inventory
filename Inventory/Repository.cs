@@ -40,5 +40,10 @@ namespace Inventory
             // Return a list of items saved to the Item table in the database.
             return conn.Table<Item>().ToListAsync();
         }
+
+        public Task<List<Item>> GetItem(string barcode)
+        {
+            return conn.QueryAsync<Item>("select * from Item where barcode=?", barcode);
+        }
     }
 }
