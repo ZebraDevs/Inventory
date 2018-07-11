@@ -17,7 +17,7 @@ namespace Inventory.Droid
         public static string IntentAction = "barcodescanner.RECVR";
         public static string IntentCategory = "android.intent.category.DEFAULT";
 
-        public event EventHandler<String> scanDataReceived;
+        public event EventHandler<StatusEventArgs> scanDataReceived;
 
         public override void OnReceive(Context context, Intent i)
         {
@@ -26,6 +26,7 @@ namespace Inventory.Droid
             {
                 // define a string that will hold our output
                 String Out = "";
+                String sLabelType = "";
                 // get the source of the data
                 String source = i.GetStringExtra(SOURCE_TAG);
                 // save it to use later
@@ -45,7 +46,7 @@ namespace Inventory.Droid
                     if (data != null && data.Length > 0)
                     {
                         // we have some data, so let's get it's symbology
-                        String sLabelType = i.GetStringExtra(LABEL_TYPE_TAG);
+                        sLabelType = i.GetStringExtra(LABEL_TYPE_TAG);
                         // check if the string is empty
                         if (sLabelType != null && sLabelType.Length > 0)
                         {
@@ -66,7 +67,7 @@ namespace Inventory.Droid
 
                 if (scanDataReceived != null)
                 {
-                    scanDataReceived(this, Out);
+                    scanDataReceived(this, new StatusEventArgs(Out, sLabelType));
                 }
             }
         }

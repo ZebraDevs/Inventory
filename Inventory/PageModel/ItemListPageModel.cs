@@ -1,4 +1,5 @@
 ﻿using FreshMvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -49,9 +50,35 @@ namespace Inventory
                 CreateSampleData();
             }
 
-            MessagingCenter.Subscribe<App, string>(this, "ScanBarcode", (sender, arg) => {
-                ScanBarcode(arg);
-            });
+        }
+
+        protected override void ViewIsAppearing(object sender, EventArgs e)
+        {
+            base.ViewIsAppearing(sender, e);
+            var scanner = FreshIOC.Container.Resolve<IScanner>();
+
+            scanner.Enable();
+            scanner.OnScanDataCollected += ScannedDataCollected;
+            scanner.OnStatusChanged += ScannedStatusChanged;
+
+            var config = new ZebraScannerConfig();
+            config.IsUPCE0 = false;
+            config.IsUPCE1 = false;
+
+            scanner.SetConfig(config);
+        } 
+
+        protected override void ViewIsDisappearing(object sender, EventArgs e)
+        {
+            var scanner = FreshIOC.Container.Resolve<IScanner>();
+
+            if (null != scanner)
+            {
+                scanner.Disable();
+                scanner.OnScanDataCollected -= ScannedDataCollected;
+                scanner.OnStatusChanged -= ScannedStatusChanged;
+            }
+            base.ViewIsDisappearing(sender, e);
         }
 
         /// <summary>
@@ -146,15 +173,19 @@ namespace Inventory
             LoadItems();
         }
 
-        private void ScanBarcode(string barcode)
+        private void ScannedDataCollected(object sender, StatusEventArgs a_status)
         {
+            Barcode barcode = new Barcode();
+            barcode.Data = a_status.Data;
+            barcode.Type = a_status.BarcodeType;
+
             Item item;
 
-            Task<List<Item>> getItemTask = _repository.GetItem(barcode);
+            Task<List<Item>> getItemTask = _repository.GetItem(barcode.Data);
             getItemTask.Wait();
             if (getItemTask.Result.Count() < 1)
             {
-                item = new Item { Name = "", Barcode = barcode };
+                item = new Item { Name = "", Barcode = barcode.Data };
             }
             else
             {
@@ -163,6 +194,12 @@ namespace Inventory
 
 
             CoreMethods.PushPageModel<ItemPageModel>(item);
+
+        }
+
+        private void ScannedStatusChanged(object sender, string a_message)
+        {
+            string status = a_message;
         }
     }
 }

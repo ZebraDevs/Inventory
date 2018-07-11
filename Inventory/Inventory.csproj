@@ -11,11 +11,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="MainPage.xaml.cs" />
-    <Compile Remove="Interfaces\IScanner.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="PageModel\" />
     <Folder Include="Pages\" />
+    <Folder Include="Interfaces\" />
   </ItemGroup>
 </Project>
